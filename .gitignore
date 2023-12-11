@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# exclude today
+#11/
+
 # txt inputs
 *.txt
 
