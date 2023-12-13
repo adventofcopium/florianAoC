@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # exclude today
-13/
+14/
 
 # txt inputs
 *.txt
