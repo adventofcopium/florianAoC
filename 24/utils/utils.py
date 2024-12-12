@@ -19,6 +19,9 @@ class Vec:
         return self.x == other.x and self.y == other.y
     def __hash__(self):
         return hash(repr(self))
+    def get_neighbors(self, bound:"Matrix"=None):
+        neighbors = [self + dir for dir in [Vec(0,1), Vec(-1,0), Vec(0,-1), Vec(1,0)]]
+        return [nb for nb in neighbors if (nb in bound)] if bound is not None else neighbors
     
 class Matrix(np.ndarray):
     def __new__(cls, input_array):
