@@ -31,6 +31,9 @@ class Vec:
     def get_neighbors(self, bound:"Matrix"=None):
         neighbors = [self + dir for dir in [Vec(0,1), Vec(-1,0), Vec(0,-1), Vec(1,0)]]
         return [nb for nb in neighbors if (nb in bound)] if bound is not None else neighbors
+    def update(self, dir):
+        self.x += dir.x
+        self.y += dir.y
     
 class Matrix(np.ndarray):
     def __new__(cls, input_array):
@@ -48,6 +51,10 @@ class Matrix(np.ndarray):
             m, n = self.shape
             return 0 <= pos.x < m and 0 <= pos.y < n
         return super().__contains__(pos)
+    def __repr__(self):
+        return np.ndarray.__repr__(self.T)
+    def __str__(self):
+        return "\n".join(["".join(line) for line in self.T.tolist()])
     @staticmethod
     def from_str(s:str):
-        return Matrix(np.array(list(map(list, s.read().split("\n")))).T)
+        return Matrix(np.array(list(map(list, s.split("\n")))).T)
