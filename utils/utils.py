@@ -15,10 +15,22 @@ class Vec:
         return self if k == 0 else Vec(-self.y, self.x) >> k-1
     def __lshift__(self, k):
         return self if k == 0 else Vec(self.y, -self.x) << k-1
+    def __mul__(self, other):
+        return Vec(self.x * other, self.y * other)
+    def __mod__(self, other):
+        if isinstance(other, int):
+            return Vec(self.x % other, self.y % other)
+        elif isinstance(other, Vec):
+            return Vec(self.x % other.x, self.y % other.y)
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
+    def __le__(self, other):
+        return self.x <= other.x and self.y <= other.y
     def __hash__(self):
         return hash(repr(self))
+    def get_neighbors(self, bound:"Matrix"=None):
+        neighbors = [self + dir for dir in [Vec(0,1), Vec(-1,0), Vec(0,-1), Vec(1,0)]]
+        return [nb for nb in neighbors if (nb in bound)] if bound is not None else neighbors
     
 class Matrix(np.ndarray):
     def __new__(cls, input_array):
