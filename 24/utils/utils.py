@@ -26,6 +26,8 @@ class Vec:
         return self.x == other.x and self.y == other.y
     def __le__(self, other):
         return self.x <= other.x and self.y <= other.y
+    def __lt__(self, other):
+        return self.x < other.x and self.y < other.y
     def __hash__(self):
         return hash(repr(self))
     def get_neighbors(self, bound:"Matrix"=None):
@@ -54,7 +56,7 @@ class Matrix(np.ndarray):
     def __repr__(self):
         return np.ndarray.__repr__(self.T)
     def __str__(self):
-        return "\n".join(["".join(line) for line in self.T.tolist()])
+        return "\n".join(["".join([str(c) for c in line]) for line in self.T.tolist()])
     @staticmethod
     def from_str(s:str):
         return Matrix(np.array(list(map(list, s.split("\n")))).T)
