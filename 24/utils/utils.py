@@ -22,6 +22,8 @@ class Vec:
             return Vec(self.x % other, self.y % other)
         elif isinstance(other, Vec):
             return Vec(self.x % other.x, self.y % other.y)
+    def __abs__(self):
+        return Vec(abs(self.x), abs(self.y))
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
     def __le__(self, other):
@@ -30,6 +32,8 @@ class Vec:
         return self.x < other.x and self.y < other.y
     def __hash__(self):
         return hash(repr(self))
+    def __iter__(self):
+        return (a for a in [self.x, self.y])
     def get_neighbors(self, bound:"Matrix"=None):
         neighbors = [self + dir for dir in [Vec(0,1), Vec(-1,0), Vec(0,-1), Vec(1,0)]]
         return [nb for nb in neighbors if (nb in bound)] if bound is not None else neighbors
@@ -57,6 +61,8 @@ class Matrix(np.ndarray):
         return np.ndarray.__repr__(self.T)
     def __str__(self):
         return "\n".join(["".join([str(c) for c in line]) for line in self.T.tolist()])
+    def __hash__(self):
+        return hash(tuple(self))
     @staticmethod
     def from_str(s:str):
         return Matrix(np.array(list(map(list, s.split("\n")))).T)

@@ -1,13 +1,52 @@
 import sys
-
 sys.path.append("..")
-from time import sleep
-
+from utils.utils import Matrix, Vec
 import numpy as np
 from IPython.display import clear_output
-from utils.utils import Matrix, Vec
+from time import sleep
+print(*Vec(0,1))
+# Part 1
+instr_map = {
+    ">" : Vec(1, 0),
+    "v" : Vec(0, 1),
+    "<" : Vec(-1, 0),
+    "^" : Vec(0, -1)
+}
+def print_field(field, rob):
+    m = np.copy(field).view(Matrix)
+    m[rob] = '@'
+    print(m)
+with open("input.txt") as file:
+    field, instructions = file.read().split("\n\n")
+field = Matrix.from_str(field)
+instructions = instructions.replace("\n", "")
+rob = Vec(*list(zip(*np.where(field == '@')))[0])
+field[rob] = '.'
 
-with open("test.txt") as file:
+for move in instructions:
+    dir = instr_map[move]
+    newPos = rob + dir
+    newVal = field[newPos]
+    if newVal == '.':
+        rob = newPos
+    elif newVal == '#':
+        continue
+    elif newVal == 'O':
+        cur = newPos
+        while field[cur] != '#':
+            if field[cur] == '.':
+                field[cur] = 'O'
+                field[newPos] = '.'
+                rob = newPos
+                break
+            cur += dir
+        continue
+    
+# print_field(field, rob)
+x, y = np.where(field == 'O')
+sum(x + 100 * y)
+# Part 2
+with open("input.txt") as file:
     field, instructions = file.read().split("\n\n")
 field = field.replace("#", "##")
 field = field.replace("O", "[]")
@@ -16,20 +55,12 @@ field = field.replace("@", "@.")
 field = Matrix.from_str(field)
 instructions = instructions.replace("\n", "")
 
-instr_map = {
-    ">" : Vec(1, 0),
-    "v" : Vec(0, 1),
-    "<" : Vec(-1, 0),
-    "^" : Vec(0, -1)
-}
-
 shape = Vec(*field.shape)
 rob = Vec(*list(zip(*np.where(field == '@')))[0])
 boxes = [Vec(*box) for box in list(zip(*np.where(field == '[')))]
 walls = [Vec(*box) for box in list(zip(*np.where(field == '#')))]
 def print_field2(rob, boxes, walls, shape, symbol='@'):
     m = Matrix(np.full((shape.x, shape.y), '.'))
-    # m = np.pad(m, ((2, 2), (1, 1)), 'constant', constant_values='#').view(Matrix)
     for wall in walls:
         m[wall] = '#'
     for box in boxes:
@@ -70,14 +101,30 @@ def move_box_vert(pos, dir):
     [box.update(dir) for box in to_move]
     return True
     
-        
-def move_box_hor(pos, dir):
+def move_box_right(pos, dir):
     to_move = []
     cur = pos
     while cur not in walls:
         if cur in boxes:
             to_move.append(boxes[boxes.index(cur)])
-            cur += dir*2
+            cur += dir * 2
+        else: # free space -> update all boxes
+            [box.update(dir) for box in to_move]
+            return True
+    return False
+
+def move_box_left(pos, dir):
+    to_move = []
+    cur = pos
+    while cur not in walls:
+        if cur in boxes:
+            # print("box")
+            to_move.append(boxes[boxes.index(cur)])
+            cur += dir
+            if cur not in walls and cur + dir not in boxes:
+                [box.update(dir) for box in to_move]
+                return True
+            cur += dir 
         else: # free space -> update all boxes
             [box.update(dir) for box in to_move]
             return True
@@ -86,10 +133,26 @@ def move_box_hor(pos, dir):
 def move_box(pos, dir):
     if dir in vertical_moves:
         return move_box_vert(pos, dir)
+    elif dir == left:
+        return move_box_left(pos, dir)
+    return move_box_right(pos, dir)
+import keyboard.keyboard as keyboard
+# instructions = ""
+while True:
+    key = keyboard.read_key()
+    print(key)
+    if key == 'x':
+        break
+    elif key == 'up':
+        move = '^'
+    elif key == 'left':
+        move = '<'
+    elif key == 'down':
+        move = 'v'
+    elif key == 'right':
+        move = '>'
     else:
-        return move_box_hor(pos, dir)
-# dh = display(print_field2(rob, boxes, shape), display_id=True, 
-for move in instructions:
+        continue
     dir = instr_map[move]
     newPos = rob + dir
     can_move = False
@@ -101,13 +164,16 @@ for move in instructions:
         can_move = True
     if can_move:
         rob = newPos
-    x = input()
-    if x == 'x':
-        break
+    # x = input()
+    # if x == 'x':
+    #     break
     # clear_output(wait=True)
     print(print_field2(rob, boxes, walls, shape, symbol=move))
-    # sleep(.2)
+    sleep(.2)
 
 print(print_field2(rob, boxes, walls, shape, symbol=move))
-x, y = np.where(field == '[')
-sum(x + 100 * y)
+def combine(x, y):
+    return x + y * 100
+sum([combine(*box) for box in boxes])
+# 1434124 too high
+# 1426285
