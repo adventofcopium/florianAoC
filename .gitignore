@@ -6,7 +6,7 @@ __pycache__/
 # exclude today
 
 # txt inputs
-*.txt
+input.txt
 
 # C extensions
 *.so
